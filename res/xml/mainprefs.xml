@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference android:defaultValue="@string/default_host" android:title="@string/CAP_HOST" android:key="@string/KEY_DEF_HOST"></EditTextPreference>
+    <CheckBoxPreference android:title="@string/CAP_ADV_CHKBX" android:summary="@string/CAPEX_ADV_CHKBX" android:defaultValue="FALSE" android:key="@string/KEY_ADVANCED_CHKBX"></CheckBoxPreference>
+    <CheckBoxPreference android:defaultValue="FALSE" android:key="@string/KEY_DBG_CHECK" android:title="@string/CAP_DBG_CHKBX"></CheckBoxPreference>
+    
+</PreferenceScreen>

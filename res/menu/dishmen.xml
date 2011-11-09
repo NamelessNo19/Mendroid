@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/it_write_com" android:title="Kommentieren" android:icon="@drawable/ic_menu_compose"></item>
+    <item android:id="@+id/it_up_img" android:title="Foto hochladen" android:icon="@drawable/ic_menu_camera"></item>
+    <item android:title="Neu laden" android:id="@+id/it_refresh_dish" android:icon="@drawable/ic_menu_refresh"></item>
+    
+</menu>

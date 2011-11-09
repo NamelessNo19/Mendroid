@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+   <item android:icon="@drawable/ic_menu_my_calendar" android:id="@+id/it_pick_date" android:visible="true" android:title="@string/CAP_PICK_DATE"></item>
+    <item android:id="@+id/it_pref" android:icon="@drawable/ic_menu_preferences" android:title="@string/CAP_PREFERENCES"></item>
+    <item android:icon="@drawable/ic_menu_delete" android:visible="true" android:id="@+id/it_del_cache" android:title="@string/CAP_DEL_CACHE"></item>
+    <item android:id="@+id/it_quit" android:icon="@drawable/ic_menu_close_clear_cancel" android:title="@string/CAP_QUIT"></item>
+    
+    
+    
+</menu>

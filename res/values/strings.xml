@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, MendroidMain!</string>
+    <string name="app_name">Mendroid 2</string>
+    <string name="SplashText">Mendroid 	2.41 beta</string>
+    <string name="version_name">2.41 beta</string>
+    <string name="svr_ver_code">v2</string>
+    <string name="MSG_NO_CON">Keine Verbindung</string>
+    <string name="MSG_DOWNLOAD_FAILED">Download fehlgeschlagen</string>
+    <string name="MSG_STARTING">Starte...</string>
+    <string name="MSG_WRITING_CACHE">Schreibe Cache...</string>
+    <string name="ERR_CACHE_WRITE">ERROR: Cache schreiben fehlgeschlagen</string>
+    <string name="MSG_LOADING_CACHE">Lade Cache...</string>
+    <string name="MSG_NO_DATA">Keine Daten</string>
+    <string name="MSG_UN_RET_DATA">Konnte keine Daten finden. </string>
+    <string name="MSG_OK">OK</string>
+    <string name="MSG_SERVER_MSG">Nachricht vom Server</string>
+    <string name="MSG_PARSING">Parse...</string>
+    <string name="MSG_DOWNLOADING">Lade Daten...</string>
+    <string name="MSG_AW_RESP">Warte auf Antwort...</string>
+    <string name="MSG_CONNECTING">Verbinde...</string>
+    <string name="CAP_QUIT">Beenden</string>
+    <string name="CAP_DEL_CACHE">Entf. Cache</string>
+    <string name="CAP_PICK_DATE">Tag wählen</string>
+    <string name="CAP_PREFERENCES">Einstellungen</string>
+    <string name="MSG_UPDATED">Updated: </string>
+    <string name="ERR_NO_CACHE">ERROR: Cache nicht gefunden</string>
+    <string name="MSG_NO_CACHE">Kein Cache vorhanden</string>
+    <string name="MSG_CACHE_DELETED">Cache entfernt</string>
+    <string name="ERR_DEL_CACHE">ERROR: Konnte Cache nicht löschen.</string>
+    <string name="CAP_HOST">Host</string>
+    <string name="default_host">mendroidbackend.appspot.com</string>
+    <string name="KEY_DEF_HOST">pref_default_host</string>
+    <string name="KEY_ADVANCED_CHKBX">pref_adv_chkbx</string>
+    <string name="CAP_ADV_CHKBX">Erweiterter Modus</string>
+    <string name="CAPEX_ADV_CHKBX">Experimentell</string>
+    <string name="CAP_COMMENTS">Kommentare:</string>
+    <string name="CAP_NOCOM">Keine Kommentare</string>
+    <string name="KEY_DBG_CHECK">dbgCheck</string>
+    <string name="CAP_DBG_CHKBX">Zeige Debug Text</string>
+</resources>
