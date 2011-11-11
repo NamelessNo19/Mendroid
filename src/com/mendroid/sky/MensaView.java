@@ -1,9 +1,6 @@
 package com.mendroid.sky;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -53,7 +50,8 @@ public class MensaView extends ListActivity {
 		super.onCreate(savedInstanceState);
 		Log.d("Mendroid", "MV Created!");
 		firstShow = true;
-		
+
+		CacheManager.setDirectory(getCacheDir());
 
 		MensaStruct mMensa = (MensaStruct) getIntent().getExtras()
 				.getSerializable("MENSA");
@@ -112,8 +110,9 @@ public class MensaView extends ListActivity {
 
 			SimpleDateFormat df = new SimpleDateFormat("dd.M HH:mm");
 			Log.v("Mendroid", "Got date");
-			Toast.makeText(this, getString(R.string.MSG_UPDATED) + df.format(d), Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(this,
+					getString(R.string.MSG_UPDATED) + df.format(d),
+					Toast.LENGTH_SHORT).show();
 			Log.v("Mendroid", "Toast created");
 			firstShow = false;
 
@@ -175,7 +174,9 @@ public class MensaView extends ListActivity {
 			return true;
 		case R.id.it_pick_date:
 			Log.d("Mendroid",
-					"Date Dialog called: "+ String.valueOf(mDay) + "-" + String.valueOf(mMonth) + "-" + String.valueOf(mYear));
+					"Date Dialog called: " + String.valueOf(mDay) + "-"
+							+ String.valueOf(mMonth) + "-"
+							+ String.valueOf(mYear));
 			showDialog(DATE_DIALOG_ID);
 			return true;
 		case R.id.it_quit:
@@ -190,75 +191,36 @@ public class MensaView extends ListActivity {
 	}
 
 	private void deleteCache() {
-		
+
 		deleteImageCache();
-				
 
-		final String filename = getCacheDir().getPath()
-				+ MendroidISMain.CACHE_FILE;
-		File f = new File(filename);
-
-		if (!f.exists()) {
-			Toast.makeText(this,  getString(R.string.MSG_NO_CACHE), Toast.LENGTH_SHORT)
-					.show();
+		if (CacheManager.delete()) {
+			Toast.makeText(this, getString(R.string.MSG_CACHE_DELETED),
+					Toast.LENGTH_SHORT).show();
 		} else {
-			if (f.delete()) {
-				Toast.makeText(this,  getString(R.string.MSG_CACHE_DELETED),
-						Toast.LENGTH_SHORT).show();
-			} else {
-				Toast.makeText(this,  getString(R.string.ERR_DEL_CACHE),
-						Toast.LENGTH_SHORT).show();
-			}
+			Toast.makeText(this, getString(R.string.ERR_DEL_CACHE),
+					Toast.LENGTH_SHORT).show();
 		}
 
 	}
-	
+
 	private void deleteImageCache() {
 		File imgCache = getDir("imagecache", Context.MODE_PRIVATE);
-		for(File file: imgCache.listFiles()) {
+		for (File file : imgCache.listFiles()) {
 			file.delete();
-		}		
+		}
 	}
 
-	private MensaList loadCache() {
-		final String filename = getCacheDir().getPath()
-				+ MendroidISMain.CACHE_FILE;
-
-		File f = new File(filename);
-
-		if (!f.exists()) {
-			Toast.makeText(this, getString(R.string.ERR_NO_CACHE), Toast.LENGTH_LONG)
-					.show();
-			return null;
-		}
-
-		FileInputStream fis = null;
-		ObjectInputStream in = null;
-		MensaList data = null;
-
-		try {
-			fis = new FileInputStream(filename);
-			in = new ObjectInputStream(fis);
-			data = (MensaList) in.readObject();
-			in.close();
-		} catch (IOException ex) {
-			return null;
-		} catch (ClassNotFoundException e) {
-			return null;
-		}
-
-		// tv.append("\nGot cache!");
-		return data;
-
-	}
+	
 
 	private void changeDate(Date d) {
-		MensaList cache = loadCache();
+		MensaList cache = CacheManager.load();
 
 		if (cache != null) {
 			MensaStruct mMensa = cache.getByDay(d);
 			if (mMensa == null) {
-				Toast.makeText(this,  getString(R.string.MSG_NO_DATA), Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, getString(R.string.MSG_NO_DATA),
+						Toast.LENGTH_SHORT).show();
 			} else {
 				generateList(mMensa);
 				this.setListAdapter(new MyArrayAdapter(this, liec));
@@ -298,7 +260,7 @@ public class MensaView extends ListActivity {
 	private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
 
 		public void onDateSet(DatePicker view, int year, int monthOfYear,
-				int dayOfMonth) {	
+				int dayOfMonth) {
 			changeDate(new Date(year - 1900, monthOfYear, dayOfMonth));
 		}
 	};

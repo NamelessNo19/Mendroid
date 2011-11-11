@@ -2,16 +2,11 @@ package com.mendroid.sky;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.zip.GZIPInputStream;
 
 import com.mendroid.sky.R;
@@ -42,13 +37,12 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-
 public class MendroidISMain extends Activity {
 
 	public final static String PATH = "/mendroidbackend/data";
-	public final static String CACHE_FILE = "cache.bin";
+	
 
-	private final static int UPDATE_FREQ_MIN = 60;
+	private final static int UPDATE_HOUR = 10;
 
 	private final static int DIALOG_NODATA_ID = 0;
 	private final static int DIALOG_MESSAGE_ID = 1;
@@ -63,9 +57,9 @@ public class MendroidISMain extends Activity {
 	private boolean hasNetwork;
 
 	private String serverMessage;
-	
+
 	private boolean prefLocked;
-	
+
 	SharedPreferences preferences;
 
 	/** Called when the activity is first created. */
@@ -80,7 +74,6 @@ public class MendroidISMain extends Activity {
 		// Open Splash screen
 		setContentView(R.layout.splashscreen);
 
-	
 		// Find GUI Elements
 		splashOut = (TextView) findViewById(R.id.splashOut);
 		pgBar = (ProgressBar) findViewById(R.id.progressBar1);
@@ -89,34 +82,34 @@ public class MendroidISMain extends Activity {
 		hasOnlineData = false;
 		hasCacheData = false;
 		prefLocked = true;
-		
+
 		PreferenceManager.setDefaultValues(this, R.xml.mainprefs, false);
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		// Check for Internet connection
 		checkConnection();
 
-		// Try to load Cache
-		myMensa = loadCache();
+		// Loading Cache
+		CacheManager.setDirectory(getCacheDir());
+		splashOut.setText(getString(R.string.MSG_LOADING_CACHE));
+		myMensa = CacheManager.load();
 		hasCacheData = (myMensa != null);
 		serverMessage = null;
-
+		
 		// Check cache age
-		boolean cacheOutdated = true;
-		if (hasCacheData) {
-			final Calendar c = Calendar.getInstance();
-			long diff = c.getTimeInMillis() - myMensa.getLastUpdate().getTime();
-			cacheOutdated = diff > UPDATE_FREQ_MIN * 60000;
-		}
+		final boolean cacheOutdated = (!hasCacheData) || isCacheOutdated(myMensa.getLastUpdate());
 
 		if (cacheOutdated && hasNetwork) {
-			String host = preferences.getString(getString(R.string.KEY_DEF_HOST), getString(R.string.default_host));
-			
+			String host = preferences.getString(
+					getString(R.string.KEY_DEF_HOST),
+					getString(R.string.default_host));
+
 			Log.v("Mendroid", "Initiating download from: " + host + PATH);
 			URL[] params = new URL[1];
 
 			try {
-				params[0] = new URL("http://" + host + PATH + "/" + getString(R.string.svr_ver_code));
+				params[0] = new URL("http://" + host + PATH + "/"
+						+ getString(R.string.svr_ver_code));
 			} catch (MalformedURLException e) {
 				Log.w("Mendroid",
 						"Malformed URL Exception: " + e.getLocalizedMessage());
@@ -128,7 +121,7 @@ public class MendroidISMain extends Activity {
 		} else {
 			gotData();
 		}
-				
+
 	}
 
 	@Override
@@ -141,7 +134,6 @@ public class MendroidISMain extends Activity {
 
 	public void gotData() {
 		Log.v("Mendroid", "gotData called");
-		
 
 		// Stop progress bar
 		pgBar.setVisibility(View.INVISIBLE);
@@ -153,7 +145,6 @@ public class MendroidISMain extends Activity {
 			splashOut.setText(getString(R.string.MSG_DOWNLOAD_FAILED));
 		}
 
-
 		if (serverMessage != null && serverMessage.length() > 0) {
 			// Showing Message dialog first...
 			showDialog(DIALOG_MESSAGE_ID);
@@ -161,20 +152,19 @@ public class MendroidISMain extends Activity {
 			// or start immediately
 			startView();
 		}
-		
+
 		prefLocked = false;
 
 	}
 
 	private void startView() {
-		
+
 		if (!hasCacheData && !hasOnlineData) {
 			// No Data
 			showDialog(DIALOG_NODATA_ID);
 			return;
 		}
-		
-		
+
 		splashOut.setText(getString(R.string.MSG_STARTING));
 		final Calendar today = Calendar.getInstance();
 		MensaStruct todaysMensa = myMensa.getByDay(today.getTime());
@@ -194,63 +184,7 @@ public class MendroidISMain extends Activity {
 	}
 
 	/* Rewrite cache file */
-	private boolean saveCache(MensaList myMensa) {
-		Log.v("Mendroid", "Saving Cache");
-		final String filename = getCacheDir().getPath() + CACHE_FILE;
-
-		FileOutputStream fos = null;
-		ObjectOutputStream out = null;
-
-		splashOut.setText(getString(R.string.MSG_WRITING_CACHE));
-
-		try {
-			fos = new FileOutputStream(filename);
-			out = new ObjectOutputStream(fos);
-			out.writeObject(myMensa);
-			out.close();
-		} catch (IOException e) {
-			splashOut.setText(getString(R.string.ERR_CACHE_WRITE));
-			Log.w("Mendroid", "IO Exception while Saving Cache");
-			return false;
-		}
-
-		return true;
-	}
-
-	private MensaList loadCache() {
-		Log.v("Mendroid", "Loading cache");
-		final String filename = getCacheDir().getPath() + CACHE_FILE;
-
-		File f = new File(filename);
-
-		splashOut.setText(getString(R.string.MSG_LOADING_CACHE));
-
-		if (!f.exists()) {
-			// No cache
-			Log.v("Mendroid", "No cache found.");
-			return null;
-		}
-
-		FileInputStream fis = null;
-		ObjectInputStream in = null;
-		MensaList data = null;
-
-		try {
-			fis = new FileInputStream(filename);
-			in = new ObjectInputStream(fis);
-			data = (MensaList) in.readObject();
-			in.close();
-		} catch (IOException ex) {
-			Log.w("Mendroid", "IO Exception while loading cache.");
-			return null;
-		} catch (ClassNotFoundException e) {
-			Log.w("Mendroid", "CNF Exception while loading cache.");
-			return null;
-		}
-		Log.v("Mendroid", "Cache loaded");
-		return data;
-
-	}
+	
 
 	public void parse(String code) {
 		hasOnlineData = false;
@@ -294,13 +228,14 @@ public class MendroidISMain extends Activity {
 			builder.setTitle(getString(R.string.MSG_SERVER_MSG));
 			builder.setMessage(serverMessage);
 			builder.setIcon(android.R.drawable.ic_dialog_info);
-			builder.setPositiveButton(getString(R.string.MSG_OK), new OnClickListener() {
+			builder.setPositiveButton(getString(R.string.MSG_OK),
+					new OnClickListener() {
 
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					startView();
-				}
-			});
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							startView();
+						}
+					});
 			return builder.create();
 		default:
 			return null;
@@ -319,16 +254,31 @@ public class MendroidISMain extends Activity {
 			}
 		}
 	}
-	
+
 	@Override
-	public boolean onKeyDown (int keyCode, KeyEvent event) {
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_MENU) {
-		  if (!prefLocked) {	
-			startActivity(new Intent(this, Preferences.class));
-		  }
+			if (!prefLocked) {
+				startActivity(new Intent(this, Preferences.class));
+			}
 			return true;
-		}		
-		return super.onKeyDown(keyCode, event);	
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
+	private boolean isCacheOutdated(Date cacheDate) {
+		
+		Date today = Calendar.getInstance().getTime();
+
+		if (cacheDate.compareTo(today) > 0) {
+			Log.w("Mendroid", "Cache date is more recent than System Time.");
+			return true;
+		} else if (today.getDate() == cacheDate.getDate() && today.getMonth() == cacheDate.getMonth()
+				&& today.getYear() == cacheDate.getYear()) {
+			return (cacheDate.getHours() < UPDATE_HOUR);
+		}
+		
+		return true;
 	}
 
 	class ParserTask extends AsyncTask<String, Void, MensaList> {
@@ -361,7 +311,7 @@ public class MendroidISMain extends Activity {
 			try {
 				// Decode and unzip
 				ByteArrayInputStream bais = new ByteArrayInputStream(
-				Base64.decode(code, Base64.DEFAULT));
+						Base64.decode(code, Base64.DEFAULT));
 				GZIPInputStream gzis = new GZIPInputStream(bais);
 				InputStreamReader reader = new InputStreamReader(gzis, "UTF-8");
 				BufferedReader in = new BufferedReader(reader);
@@ -382,7 +332,8 @@ public class MendroidISMain extends Activity {
 				Log.v("Mendroid", "Parsing succeeded");
 				result.update();
 				myMensa = result;
-				saveCache(result);
+				splashOut.setText(getString(R.string.MSG_WRITING_CACHE));
+				CacheManager.save(result);
 				hasOnlineData = true;
 			} else {
 				Log.w("Mendroid", "Parsing failed");

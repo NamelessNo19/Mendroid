@@ -2,8 +2,8 @@
 <resources>
     <string name="hello">Hello World, MendroidMain!</string>
     <string name="app_name">Mendroid 2</string>
-    <string name="SplashText">Mendroid 	2.41 beta</string>
-    <string name="version_name">2.41 beta</string>
+    <string name="SplashText">Mendroid 	2.42 beta</string>
+    <string name="version_name">2.42 beta</string>
     <string name="svr_ver_code">v2</string>
     <string name="MSG_NO_CON">Keine Verbindung</string>
     <string name="MSG_DOWNLOAD_FAILED">Download fehlgeschlagen</string>
