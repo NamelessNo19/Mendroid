@@ -2,6 +2,7 @@ package com.mendroid.sky;
 
 import java.util.ArrayList;
 
+import com.mendroid.sky.viewpageinicator.TitleProvider;
 import com.mendroid.structures.DishStruct;
 import com.mendroid.structures.MensaLines;
 import com.mendroid.structures.MensaList;
@@ -14,32 +15,56 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
+public class MensaPagerAdapter extends PagerAdapter implements TitleProvider {
 
-public class MensaPagerAdapter extends PagerAdapter {
-	
 	private final MensaList mList;
 
+	private final String[] dayStrings;
+
 	private final MensaView menView;
-	
+
 	public MensaPagerAdapter(MensaView menView, MensaList data) {
-		
+
 		if (data == null || data.getList().size() < 1) {
 			throw new IllegalArgumentException("Data empty!");
 		}
-	
+
 		mList = data;
 		this.menView = menView;
+
+		dayStrings = new String[data.getList().size()];
+		for (int i = 0; i < dayStrings.length; i++) {
+			switch (data.getList().get(i).getDay().getDay()) {
+			case 1:
+				dayStrings[i] = "Montag";
+				break;
+			case 2:
+				dayStrings[i] = "Dienstag";
+				break;
+			case 3:
+				dayStrings[i] = "Mittwoch";
+				break;
+			case 4:
+				dayStrings[i] = "Donnerstag";
+				break;
+			case 5:
+				dayStrings[i] = "Freitag";
+				break;
+			default:
+				dayStrings[i] = "ERROR";
+				break;
+			}
+		}
 	}
 
 	@Override
-    public void destroyItem(View collection, int position, Object view) {
-            ((ViewPager) collection).removeView((ListView) view);
-    }
-
+	public void destroyItem(View collection, int position, Object view) {
+		((ViewPager) collection).removeView((ListView) view);
+	}
 
 	@Override
 	public void finishUpdate(View arg0) {
-		//menView.onDateSwiped();		
+		// menView.onDateSwiped();
 	}
 
 	@Override
@@ -50,25 +75,27 @@ public class MensaPagerAdapter extends PagerAdapter {
 	@Override
 	public Object instantiateItem(View container, int position) {
 		ListView lv = new ListView(menView);
-		ListElementContainer[] liec = generateList(mList.getList().get(position));
-		Log.d("Mendroid", "Instantiating " + String.valueOf(position + 1) + ". list.");
+		ListElementContainer[] liec = generateList(mList.getList()
+				.get(position));
+		Log.d("Mendroid", "Instantiating " + String.valueOf(position + 1)
+				+ ". list.");
 		lv.setAdapter(new MyArrayAdapter(menView, liec));
 		lv.setOnItemClickListener(menView);
-		
+
 		((ViewPager) container).addView(lv, 0);
 
 		return lv;
 	}
 
 	@Override
-	 public boolean isViewFromObject(View view, Object object) {
-		return view==((ListView)object);
+	public boolean isViewFromObject(View view, Object object) {
+		return view == ((ListView) object);
 	}
 
 	@Override
 	public void restoreState(Parcelable arg0, ClassLoader arg1) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -80,9 +107,9 @@ public class MensaPagerAdapter extends PagerAdapter {
 	@Override
 	public void startUpdate(View arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	private ListElementContainer[] generateList(MensaStruct mMensa) {
 
 		ArrayList<ListElementContainer> buffer = new ArrayList<ListElementContainer>();
@@ -105,6 +132,11 @@ public class MensaPagerAdapter extends PagerAdapter {
 		buffer.toArray(liec);
 		return liec;
 
+	}
+
+	@Override
+	public String getTitle(int position) {
+		return dayStrings[position];
 	}
 
 }

@@ -40,24 +40,21 @@ public class MensaView extends Activity implements OnItemClickListener,
 	private int mMonth;
 	private int mDay;
 	private int curListIndex;
-	private boolean customTitle;
 
 	private MensaList mMenList;
 
 	private ViewPager pager;
 
-	@SuppressWarnings("unused")
-	private TextView titleTvLeft;
-	private TextView titleTvRight;
+
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		customTitle = requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		Log.d("Mendroid", "MV Created!");
 
 		setContentView(R.layout.menviewlay);
 		pager = (ViewPager) findViewById(R.id.listpager);
-		pager.setOnPageChangeListener(this);
+		
 
 		firstShow = true;
 
@@ -84,6 +81,10 @@ public class MensaView extends Activity implements OnItemClickListener,
 				finish();
 			} else {
 				pager.setAdapter(new MensaPagerAdapter(this, mMenList));
+				
+				TitlePageIndicator titleIndicator = (TitlePageIndicator)findViewById(R.id.titles);
+				titleIndicator.setViewPager(pager);
+				titleIndicator.setOnPageChangeListener(this);
 			}
 
 			if (curListIndex < 0) {
@@ -104,19 +105,6 @@ public class MensaView extends Activity implements OnItemClickListener,
 			mMonth = mMensa.getDay().getMonth();
 			mDay = mMensa.getDay().getDate();
 
-			Log.v("Mendroid", "Setting Title");
-			if (customTitle) {
-
-				titleTvLeft = (TextView) findViewById(R.id.titleTvLeft); // Necessary;
-																			// no
-																			// idea
-																			// why.
-				getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
-						R.layout.titlelayout);
-				titleTvRight = (TextView) findViewById(R.id.titleTvRight);
-
-				generateTitle();
-			}
 
 		}
 
@@ -214,24 +202,9 @@ public class MensaView extends Activity implements OnItemClickListener,
 				mYear = d.getYear() + 1900;
 				mMonth = d.getMonth();
 				mDay = d.getDate();
-				generateTitle();
 			}
 		}
 
-	}
-
-	private void generateTitle() {
-		if (customTitle) {
-			if (titleTvRight != null) {
-				SimpleDateFormat sdf = new SimpleDateFormat("E dd. MMM");
-				Calendar cal = Calendar.getInstance();
-				cal.clear();
-				cal.set(mYear, mMonth, mDay);
-				titleTvRight.setText(sdf.format(cal.getTime()));
-			} else {
-				Log.w("Mendroid", "Failed to access titlebar.");
-			}
-		}
 	}
 
 	@Override
@@ -289,8 +262,7 @@ public class MensaView extends Activity implements OnItemClickListener,
 				Date d = mMenList.getList().get(curListIndex).getDay();
 				mYear = d.getYear() + 1900;
 				mMonth = d.getMonth();
-				mDay = d.getDate();
-				generateTitle();				
+				mDay = d.getDate();				
 			}
 		}
 	}
