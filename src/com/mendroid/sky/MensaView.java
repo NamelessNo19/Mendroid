@@ -2,38 +2,36 @@ package com.mendroid.sky;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.DatePicker;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mendroid.structures.DishStruct;
-import com.mendroid.structures.MensaLines;
 import com.mendroid.structures.MensaList;
 import com.mendroid.structures.MensaStruct;
 
-public class MensaView extends ListActivity {
+public class MensaView extends Activity implements OnItemClickListener,
+		OnPageChangeListener {
 
-	private static final String[] errorString = { "ERROR: No Data" };
 	private static final String INDEX_KEY = "MEN_LIST_INDEX";
-	private ListElementContainer[] liec;
 	private boolean firstShow;
 
 	static final int DATE_DIALOG_ID = 0;
@@ -46,53 +44,67 @@ public class MensaView extends ListActivity {
 
 	private MensaList mMenList;
 
+	private ViewPager pager;
+
 	@SuppressWarnings("unused")
 	private TextView titleTvLeft;
 	private TextView titleTvRight;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		customTitle = requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		Log.d("Mendroid", "MV Created!");
+
+		setContentView(R.layout.menviewlay);
+		pager = (ViewPager) findViewById(R.id.listpager);
+		pager.setOnPageChangeListener(this);
+
 		firstShow = true;
 
 		CacheManager.setDirectory(getCacheDir());
 		mMenList = CacheManager.load();
 
 		if (savedInstanceState != null) {
-		curListIndex = savedInstanceState.getInt(INDEX_KEY, -1);
-		} else {
+			curListIndex = savedInstanceState.getInt(INDEX_KEY, -1);
 			Log.d("Mendroid", "Instance State restored");
+		} else {
 			curListIndex = -1;
 		}
 
 		Log.v("Mendroid", "Mensa loaded");
-		customTitle = requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 
 		if (mMenList == null || mMenList.getList().size() == 0) {
-			this.setListAdapter(new ArrayAdapter<String>(this,
-					android.R.layout.simple_list_item_1, errorString));
-
+			Log.e("Mendroid", "Mensa View called without data. Aborting.");
+			this.finish();
 		} else {
 
-			MensaStruct mMensa = mMenList.getByDay(new Date());
-			if (mMensa == null) {
+			Log.v("Mendroid", "Creating Pager");
+			if (pager == null) {
+				Log.e("Mendroid", "Pager View not found. Aboring.");
+				finish();
+			} else {
+				pager.setAdapter(new MensaPagerAdapter(this, mMenList));
+			}
 
+			if (curListIndex < 0) {
+				curListIndex = mMenList.getIndexByDay(new Date());
 				if (curListIndex < 0) {
-					if (mMenList.getList().size() > 1) {
-						mMensa = mMenList.getList().get(1);
-					} else {
-						mMensa = mMenList.getList().get(0);
-					}
-				} else {
-					mMensa = mMenList.getList().get(curListIndex);
+					curListIndex = (mMenList.getList().size() > 1) ? 1 : 0;
 				}
 			}
 
+			pager.setCurrentItem(curListIndex);
+
+			Log.v("Mendroid", "List Index: " + String.valueOf(curListIndex));
+			MensaStruct mMensa = mMenList.getList().get(curListIndex);
+
 			Log.d("Mendroid", "Got Mensa of " + mMensa.getDay().toString());
+
 			mYear = mMensa.getDay().getYear() + 1900;
 			mMonth = mMensa.getDay().getMonth();
 			mDay = mMensa.getDay().getDate();
 
+			Log.v("Mendroid", "Setting Title");
 			if (customTitle) {
 
 				titleTvLeft = (TextView) findViewById(R.id.titleTvLeft); // Necessary;
@@ -105,20 +117,7 @@ public class MensaView extends ListActivity {
 
 				generateTitle();
 			}
-			Log.v("Mendroid", "Title set");
-			generateList(mMensa);
-			Log.v("Mendroid", "List generated");
-			if (liec == null) {
-				Log.w("Mendroid", "LIEC null!");
-			} else {
-				for (ListElementContainer i : liec) {
-					if (i == null) {
-						Log.w("Mendroid", "LIEC Element null!");
-					}
-				}
-			}
-			this.setListAdapter(new MyArrayAdapter(this, liec));
-			Log.v("Mendroid", "List set");
+
 		}
 
 	}
@@ -145,44 +144,6 @@ public class MensaView extends ListActivity {
 			firstShow = false;
 
 		}
-	}
-
-	private void generateList(MensaStruct mMensa) {
-
-		ArrayList<ListElementContainer> buffer = new ArrayList<ListElementContainer>();
-		for (MensaLines curLine : MensaLines.values()) {
-			buffer.add(new ListElementContainer(curLine));
-
-			if (mMensa.getLines()[curLine.ordinal()].isClosed()) {
-				buffer.add(new ListElementContainer((DishStruct) null));
-			} else {
-				DishStruct[] dishes = mMensa.getLines()[curLine.ordinal()]
-						.getDishes();
-				for (DishStruct curDish : dishes) {
-					buffer.add(new ListElementContainer(curDish));
-				}
-			}
-
-		}
-
-		liec = new ListElementContainer[buffer.size()];
-		buffer.toArray(liec);
-
-	}
-
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
-
-		ListElementContainer curCont = (ListElementContainer) getListAdapter()
-				.getItem(position);
-
-		if (curCont != null && !curCont.isLine() && curCont.getDish() != null) {
-			Intent it = new Intent(this, DishDetail.class);
-			it.putExtra("DISH", curCont.getDish());
-			startActivity(it);
-		}
-
 	}
 
 	@Override
@@ -248,10 +209,8 @@ public class MensaView extends ListActivity {
 				Toast.makeText(this, getString(R.string.MSG_NO_DATA),
 						Toast.LENGTH_SHORT).show();
 			} else {
-				MensaStruct mMensa = mMenList.getList().get(index);
 				curListIndex = index;
-				generateList(mMensa);
-				this.setListAdapter(new MyArrayAdapter(this, liec));
+				pager.setCurrentItem(index);
 				mYear = d.getYear() + 1900;
 				mMonth = d.getMonth();
 				mDay = d.getDate();
@@ -275,8 +234,6 @@ public class MensaView extends ListActivity {
 		}
 	}
 
-	
-
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
@@ -293,6 +250,22 @@ public class MensaView extends ListActivity {
 		return null;
 	}
 
+	@Override
+	public void onItemClick(AdapterView<?> l, View v, int position, long id) {
+
+		ListElementContainer curCont = (ListElementContainer) l
+				.getItemAtPosition(position);
+
+		if (curCont != null && !curCont.isLine() && curCont.getDish() != null) {
+			Intent it = new Intent(this, DishDetail.class);
+			it.putExtra("DISH", curCont.getDish());
+			startActivity(it);
+		}
+
+	}
+
+
+
 	private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
 
 		public void onDateSet(DatePicker view, int year, int monthOfYear,
@@ -300,5 +273,30 @@ public class MensaView extends ListActivity {
 			changeDate(new Date(year - 1900, monthOfYear, dayOfMonth));
 		}
 	};
+
+	@Override
+	public void onPageScrollStateChanged(int arg0) {
+	}
+
+	@Override
+	public void onPageScrolled(int position, float positionOffset,
+			int positionOffsetPixels) {
+		if (positionOffset == 0) {
+			
+			if (position != curListIndex) {
+				Log.d("Mendroid", "Page changed to " + String.valueOf(position));
+				curListIndex = position;
+				Date d = mMenList.getList().get(curListIndex).getDay();
+				mYear = d.getYear() + 1900;
+				mMonth = d.getMonth();
+				mDay = d.getDate();
+				generateTitle();				
+			}
+		}
+	}
+
+	@Override
+	public void onPageSelected(int arg0) {
+	}
 
 }
