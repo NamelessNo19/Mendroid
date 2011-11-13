@@ -242,7 +242,7 @@ public class MensaView extends ListActivity {
 	private void changeDate(Date d) {
 
 		if (mMenList != null) {
-			int index = getIndexByDay(mMenList, d);
+			int index = mMenList.getIndexByDay(d);
 
 			if (index < 0) {
 				Toast.makeText(this, getString(R.string.MSG_NO_DATA),
@@ -275,18 +275,7 @@ public class MensaView extends ListActivity {
 		}
 	}
 
-	private static int getIndexByDay(MensaList mList, Date d) {
-		int i = 0;
-		for (MensaStruct tmp : mList) {
-			if (tmp.getDay().getYear() == d.getYear()
-					&& tmp.getDay().getMonth() == d.getMonth()
-					&& tmp.getDay().getDate() == d.getDate()) {
-				return i;
-			}
-			i++;
-		}
-		return -1;
-	}
+	
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {

@@ -46,13 +46,25 @@ public class MensaList implements Serializable, Iterable<MensaStruct> {
 	}
 
 	public MensaStruct getByDay(Date d) {
-		for(MensaStruct tmp: mensae) {
-			if (tmp.getDay().getYear() == d.getYear() 
-					&& tmp.getDay().getMonth() == d.getMonth() && tmp.getDay().getDate() == d.getDate()) {
-				return tmp;
-			}
+		final int index = getIndexByDay(d);
+		if (index < 0) {
+			return null;
+		} else {
+			return mensae.get(index);
 		}
-		return null;
+	}
+	
+	public int getIndexByDay(Date d) {
+		int i = 0;
+		for (MensaStruct tmp : mensae) {
+			if (tmp.getDay().getYear() == d.getYear()
+					&& tmp.getDay().getMonth() == d.getMonth()
+					&& tmp.getDay().getDate() == d.getDate()) {
+				return i;
+			}
+			i++;
+		}
+		return -1;
 	}
 		
 	
