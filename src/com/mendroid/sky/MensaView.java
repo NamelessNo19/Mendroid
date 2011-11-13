@@ -32,6 +32,7 @@ import com.mendroid.structures.MensaStruct;
 public class MensaView extends ListActivity {
 
 	private static final String[] errorString = { "ERROR: No Data" };
+	private static final String INDEX_KEY = "MEN_LIST_INDEX";
 	private ListElementContainer[] liec;
 	private boolean firstShow;
 
@@ -40,7 +41,10 @@ public class MensaView extends ListActivity {
 	private int mYear;
 	private int mMonth;
 	private int mDay;
+	private int curListIndex;
 	private boolean customTitle;
+
+	private MensaList mMenList;
 
 	@SuppressWarnings("unused")
 	private TextView titleTvLeft;
@@ -52,17 +56,37 @@ public class MensaView extends ListActivity {
 		firstShow = true;
 
 		CacheManager.setDirectory(getCacheDir());
+		mMenList = CacheManager.load();
 
-		MensaStruct mMensa = (MensaStruct) getIntent().getExtras()
-				.getSerializable("MENSA");
+		if (savedInstanceState != null) {
+		curListIndex = savedInstanceState.getInt(INDEX_KEY, -1);
+		} else {
+			Log.d("Mendroid", "Instance State restored");
+			curListIndex = -1;
+		}
+
 		Log.v("Mendroid", "Mensa loaded");
 		customTitle = requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 
-		if (mMensa == null) {
+		if (mMenList == null || mMenList.getList().size() == 0) {
 			this.setListAdapter(new ArrayAdapter<String>(this,
 					android.R.layout.simple_list_item_1, errorString));
 
 		} else {
+
+			MensaStruct mMensa = mMenList.getByDay(new Date());
+			if (mMensa == null) {
+
+				if (curListIndex < 0) {
+					if (mMenList.getList().size() > 1) {
+						mMensa = mMenList.getList().get(1);
+					} else {
+						mMensa = mMenList.getList().get(0);
+					}
+				} else {
+					mMensa = mMenList.getList().get(curListIndex);
+				}
+			}
 
 			Log.d("Mendroid", "Got Mensa of " + mMensa.getDay().toString());
 			mYear = mMensa.getDay().getYear() + 1900;
@@ -105,8 +129,12 @@ public class MensaView extends ListActivity {
 		Log.v("Mendroid", "MV resume");
 
 		if (firstShow) {
-			Log.v("Mendroid", "First show");
-			Date d = (Date) getIntent().getExtras().getSerializable("DATE");
+
+			if (mMenList == null) {
+				return;
+			}
+
+			Date d = mMenList.getLastUpdate();
 
 			SimpleDateFormat df = new SimpleDateFormat("dd.M HH:mm");
 			Log.v("Mendroid", "Got date");
@@ -211,17 +239,17 @@ public class MensaView extends ListActivity {
 		}
 	}
 
-	
-
 	private void changeDate(Date d) {
-		MensaList cache = CacheManager.load();
 
-		if (cache != null) {
-			MensaStruct mMensa = cache.getByDay(d);
-			if (mMensa == null) {
+		if (mMenList != null) {
+			int index = getIndexByDay(mMenList, d);
+
+			if (index < 0) {
 				Toast.makeText(this, getString(R.string.MSG_NO_DATA),
 						Toast.LENGTH_SHORT).show();
 			} else {
+				MensaStruct mMensa = mMenList.getList().get(index);
+				curListIndex = index;
 				generateList(mMensa);
 				this.setListAdapter(new MyArrayAdapter(this, liec));
 				mYear = d.getYear() + 1900;
@@ -245,6 +273,25 @@ public class MensaView extends ListActivity {
 				Log.w("Mendroid", "Failed to access titlebar.");
 			}
 		}
+	}
+
+	private static int getIndexByDay(MensaList mList, Date d) {
+		int i = 0;
+		for (MensaStruct tmp : mList) {
+			if (tmp.getDay().getYear() == d.getYear()
+					&& tmp.getDay().getMonth() == d.getMonth()
+					&& tmp.getDay().getDate() == d.getDate()) {
+				return i;
+			}
+			i++;
+		}
+		return -1;
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putInt(INDEX_KEY, curListIndex);
 	}
 
 	@Override

@@ -176,9 +176,9 @@ public class MendroidISMain extends Activity {
 
 		// Starting Listview activity
 		Intent it = new Intent(this, MensaView.class);
-		it.putExtra("MENSA", todaysMensa);
-		Log.d("Mendroid", "Putting Mensa of " + todaysMensa.getDay().toString());
-		it.putExtra("DATE", myMensa.getLastUpdate());
+		//it.putExtra("MENSA", todaysMensa);
+		//Log.d("Mendroid", "Putting Mensa of " + todaysMensa.getDay().toString());
+		//it.putExtra("DATE", myMensa.getLastUpdate());
 		Log.d("Mendroid", "Calling MensaView");
 		startActivity(it);
 	}
