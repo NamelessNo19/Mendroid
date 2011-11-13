@@ -275,7 +275,7 @@ public class MendroidISMain extends Activity {
 			return true;
 		} else if (today.getDate() == cacheDate.getDate() && today.getMonth() == cacheDate.getMonth()
 				&& today.getYear() == cacheDate.getYear()) {
-			return (cacheDate.getHours() < UPDATE_HOUR);
+			return (cacheDate.getHours() < UPDATE_HOUR && today.getHours() >= UPDATE_HOUR);
 		}
 		
 		return true;
