@@ -2,7 +2,6 @@ package com.mendroid.sky;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import android.app.Activity;
@@ -22,7 +21,6 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.DatePicker;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mendroid.structures.MensaList;

@@ -83,6 +83,7 @@ public class DishDetail extends Activity implements
 	public final static String CACHE_DIR = "imgcache";
 	private static final int CAMERA_REQ_CODE = 8848;
 	private static final int ALERT_DIA_ID = 5782;
+	private static final String IMGURI_KEY = "IMAGEURI";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -96,7 +97,14 @@ public class DishDetail extends Activity implements
 
 		currentRequest = null;
 		pgDia = null;
-		imageUri = null;
+		
+		if (savedInstanceState != null) {
+			imageUri = (Uri) savedInstanceState.getParcelable(IMGURI_KEY);
+			Log.d("Mendroid", "Image URI restored");
+		} else {
+			imageUri = null;
+		}
+		
 
 		advancedView();
 
@@ -540,5 +548,11 @@ public class DishDetail extends Activity implements
 					"Upload Error " + String.valueOf(errorCode));
 		}
 
+	} 
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putParcelable(IMGURI_KEY, imageUri);
 	}
 }
