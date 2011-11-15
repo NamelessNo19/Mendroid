@@ -1,8 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
+  <PreferenceCategory
+                android:title="@string/CAP_PREF_GENERAL">
+  
     <EditTextPreference android:defaultValue="@string/default_host" android:title="@string/CAP_HOST" android:key="@string/KEY_DEF_HOST"></EditTextPreference>
     <CheckBoxPreference android:title="@string/CAP_ADV_CHKBX" android:summary="@string/CAPEX_ADV_CHKBX" android:defaultValue="FALSE" android:key="@string/KEY_ADVANCED_CHKBX"></CheckBoxPreference>
     <CheckBoxPreference android:defaultValue="FALSE" android:key="@string/KEY_DBG_CHECK" android:title="@string/CAP_DBG_CHKBX"></CheckBoxPreference>
+    
+     </PreferenceCategory>
+     
+     <PreferenceCategory
+                android:title="@string/CAP_PREF_USER">
+                
+                <Preference
+                android:title="@string/CAP_USRID"
+                android:key="@string/KEY_USRID" 
+                android:enabled = "FALSE"/>    
+                
+                <Preference
+                android:title="@string/CAP_NICKNAME"
+                android:key="@string/KEY_NICKNAME_BTN" 
+                android:enabled = "FALSE"/>    
+                
+                <Preference
+                android:title="@string/CAP_UPERM"
+                android:key="@string/KEY_UPERM_BTN" 
+                android:enabled = "FALSE"/>  
+                
+                <Preference
+                android:title="@string/CAP_LOGIN"
+                android:key="@string/KEY_LOGIN" />
+                
+                
+                           
+              </PreferenceCategory>  
     
 </PreferenceScreen>

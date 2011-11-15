@@ -82,6 +82,10 @@ public class MendroidISMain extends Activity {
 		hasOnlineData = false;
 		hasCacheData = false;
 		prefLocked = true;
+		
+		if (!UserManager.isInitialized()) {
+			UserManager.init(this.getApplicationContext());
+		}
 
 		PreferenceManager.setDefaultValues(this, R.xml.mainprefs, false);
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);

@@ -2,8 +2,8 @@
 <resources>
     <string name="hello">Hello World, MendroidMain!</string>
     <string name="app_name">Mendroid 2</string>
-    <string name="SplashText">Mendroid 	2.53 Experimental</string>
-    <string name="version_name">Mendroid 	2.53 Experimental</string>
+    <string name="SplashText">Mendroid 	2.54 Experimental</string>
+    <string name="version_name">Mendroid 	2.54 Experimental</string>
     <string name="svr_ver_code">v2</string>
     <string name="MSG_NO_CON">Keine Verbindung</string>
     <string name="MSG_DOWNLOAD_FAILED">Download fehlgeschlagen</string>
@@ -31,11 +31,27 @@
     <string name="CAP_HOST">Host</string>
     <string name="default_host">mendroidbackend.appspot.com</string>
     <string name="KEY_DEF_HOST">pref_default_host</string>
+    <string name="KEY_LOGIN">pref_login_btn</string>
+    <string name="KEY_USRID">pref_usrid</string>
+    <string name="KEY_NICKNAME_BTN">pref_nickname_btn</string>
+    <string name="KEY_UPERM_BTN">pref_uperm_btn</string>
     <string name="KEY_ADVANCED_CHKBX">pref_adv_chkbx</string>
+    <string name="KEY_ISLOGGEDIN">pref_isli</string>
+    <string name="KEY_HASUPERM">pref_hasuperm</string>
+    <string name="KEY_NICKNAME">pref_nickname</string>
     <string name="CAP_ADV_CHKBX">Erweiterter Modus</string>
     <string name="CAPEX_ADV_CHKBX">Experimentell</string>
     <string name="CAP_COMMENTS">Kommentare:</string>
     <string name="CAP_NOCOM">Keine Kommentare</string>
     <string name="KEY_DBG_CHECK">dbgCheck</string>
     <string name="CAP_DBG_CHKBX">Zeige Debug Text</string>
+    <string name="CAP_PREF_GENERAL">Allgemein</string>
+    <string name="CAP_PREF_USER">Benutzer</string>
+    <string name="CAP_LOGIN">Anmelden</string>
+    <string name="CAP_LOGOFF">Abmelden</string>
+    <string name="CAP_USRID">Benutzer ID</string>
+    <string name="CAP_NICKNAME">Nickname</string>
+    <string name="CAP_UPERM">Upload Erlaubniss</string>
+    <string name="MSG_YES">Ja</string>
+    <string name="MSG_NO">Nein</string>
 </resources>

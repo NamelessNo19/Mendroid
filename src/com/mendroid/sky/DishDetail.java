@@ -8,9 +8,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import com.mendroid.connection.ImageCallbackListener;
 import com.mendroid.connection.ImageServerConnector;
@@ -41,7 +38,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.provider.Settings.Secure;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -105,6 +101,7 @@ public class DishDetail extends Activity implements
 			imageUri = null;
 		}
 		
+		if (!UserManager.isInitialized()) {UserManager.init(this.getApplicationContext());}
 
 		advancedView();
 
@@ -158,7 +155,7 @@ public class DishDetail extends Activity implements
 
 		uri = "http://" + host + "/mendroidbackend/request/";
 
-		myID = getSystemID();
+		myID = UserManager.getUID();
 
 		dishImage = (ImageView) findViewById(R.id.dishImage);
 		comCapRow = (TableRow) findViewById(R.id.comCapRow);
@@ -247,36 +244,7 @@ public class DishDetail extends Activity implements
 
 	}
 
-	private long getSystemID() {
-		String andID = Secure.getString(this.getContentResolver(),
-				Secure.ANDROID_ID);
-		if (andID == null || andID == "") {
-			andID = "EMULATOR";
-		}
-		final String md5Str = md5(andID);
-		BigInteger id = new BigInteger(md5Str, 16);
-		return id.longValue();
-	}
-
-	private static String md5(String s) {
-		try {
-			// Create MD5 Hash
-			MessageDigest digest = java.security.MessageDigest
-					.getInstance("MD5");
-			digest.update(s.getBytes());
-			byte messageDigest[] = digest.digest();
-
-			// Create Hex String
-			StringBuffer hexString = new StringBuffer();
-			for (int i = 0; i < messageDigest.length; i++)
-				hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
-			return hexString.toString();
-
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		return "";
-	}
+	
 
 	@Override
 	public void onImageCallback(Bitmap result, int errorCode) {
