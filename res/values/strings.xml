@@ -51,7 +51,7 @@
     <string name="CAP_LOGOFF">Abmelden</string>
     <string name="CAP_USRID">Benutzer ID</string>
     <string name="CAP_NICKNAME">Nickname</string>
-    <string name="CAP_UPERM">Upload Erlaubniss</string>
+    <string name="CAP_UPERM">Upload Erlaubnis</string>
     <string name="MSG_YES">Ja</string>
     <string name="MSG_NO">Nein</string>
 </resources>
